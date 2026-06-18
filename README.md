@@ -32,13 +32,33 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-  "your-name/zap.nvim",
-  ft = "zap",
+  "unsigned-rbx/zap.nvim",
+  lazy = false, -- required: see note below
   opts = {},
 }
 ```
 
-Highlight-only (no language server) is fine too — just `opts = { lsp = false }`.
+`opts = {}` is all you need — lazy.nvim calls `require("zap").setup({})` for you,
+and the language-server capabilities auto-detect `blink.cmp` / `cmp_nvim_lsp`.
+For highlighting only (no language server), use `opts = { lsp = false }`.
+
+> **Why `lazy = false`?** `*.zap` is a brand-new filetype, so `ft = "zap"`
+> lazy-loading can't trigger on its own — nothing detects a `.zap` file until the
+> plugin has loaded. Loading at startup is cheap: it only registers the filetype
+> and a couple of autocmds; the grammar compile and the language-server start stay
+> deferred until you actually open a `.zap` file. If you'd rather lazy-load,
+> register the filetype yourself so the trigger exists:
+>
+> ```lua
+> {
+>   "unsigned-rbx/zap.nvim",
+>   ft = "zap",
+>   init = function()
+>     vim.filetype.add({ extension = { zap = "zap" } })
+>   end,
+>   opts = {},
+> }
+> ```
 
 ## Configuration
 
@@ -56,8 +76,8 @@ Example pairing the completion capabilities with [blink.cmp](https://github.com/
 
 ```lua
 {
-  "your-name/zap.nvim",
-  ft = "zap",
+  "unsigned-rbx/zap.nvim",
+  lazy = false,
   dependencies = { "saghen/blink.cmp" },
   config = function()
     require("zap").setup({
